@@ -1,22 +1,28 @@
 jobs:
   build:
-    # working_directory: /tmp
     docker:
       - image: docker:18.09-git
-    working_directory: /tmp/myscan
+    working_directory: /tmp/myscan # Have to define in order to retrieve artifacts
     steps:
       - checkout
       - setup_remote_docker # Set up remote docker in order to use docker socket for CircleCI
       - run:
           name: Build image
           command: docker build -t scannercli-ci-test:${CIRCLE_SHA1} .
-      - run:
+     - run:
           name: Retrieve Aqua Scanner and scan build
           command: |
             mkdir scanresult
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
             docker run --name aqua -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --html > scanresult/scan.html
-            # docker run --name aqua -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile /tmp/foo.json --htmlfile /tmp/boo.html --textfile /tmp/doo.txt --text --checkonly
+      
+      ### We are able to retrieve output in all 3 formats if the --checkonly flag is set. Due to the limitations of CircleCI which does not support volume mounting between the current workspace and the remote docker set-up
+      # - run:
+      #     name: Retrieve Aqua Scanner and scan build
+      #     command: |
+      #       mkdir scanresult
+      #       docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
+      #       docker run --name aqua -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile /tmp/foo.json --htmlfile /tmp/boo.html --textfile /tmp/doo.txt --text --checkonly
       # - run:
       #     name: Retrieve scan results output files
       #     command: |

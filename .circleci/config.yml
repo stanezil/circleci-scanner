@@ -3,7 +3,7 @@ jobs:
     # working_directory: /tmp
     docker:
       - image: docker:18.09-git
-    working_directory: /tmp
+    working_directory: /tmp/myscan
     steps:
       - checkout
       - setup_remote_docker # Set up remote docker in order to use docker socket for CircleCI
@@ -14,9 +14,9 @@ jobs:
           name: Retrieve scannercli and scan build
           command: |
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
-            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --htmlfile /tmp/scan-results.html --no-verify
+            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --htmlfile /tmp/myscan/scan-results.html --no-verify
       - store_artifacts:
-          path: /tmp/scan-results.html
+          path: /tmp/myscan/scan-results.html
           destination: artifact-file
 workflows:
   version: 2

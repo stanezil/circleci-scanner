@@ -13,11 +13,10 @@ jobs:
       - run:
           name: Retrieve scannercli and scan build
           command: |
-            mkdir /tmp/myscan/scanresult
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
-            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --jsonfile /tmp/myscan/scanresult/out.json --htmlfile /tmp/myscan/scanresult/out.html --no-verify
+            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --jsonfile /tmp/myscan/out.json --htmlfile /tmp/myscan/out.html --no-verify
       - store_artifacts:
-          path: /tmp/myscan/scanresult
+          path: /tmp/myscan
           # destination: scan-file
 workflows:
   version: 2

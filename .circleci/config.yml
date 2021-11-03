@@ -15,7 +15,11 @@ jobs:
           command: |
             mkdir scanresult
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
-            docker run --rm -v /tmp/myscan/scanresult:/tmp -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile /tmp/foo.json --htmlfile /tmp/boo.html --textfile /tmp/doo.txt
+            docker run --name aqua-scanner -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile /tmp/foo.json --htmlfile /tmp/boo.html --textfile /tmp/doo.txt --text
+      - run:
+          name: Retrieve scan results output files
+          command: |
+            docker cp aqua-scanner:/tmp /tmp/myscan/scanresult
 
       - store_artifacts:
           path: /tmp/myscan/scanresult

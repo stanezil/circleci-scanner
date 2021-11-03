@@ -14,7 +14,7 @@ jobs:
           name: Retrieve Aqua Scanner and scan build
           command: |
             mkdir scanresult
-            cd scanresult
+            ls > /tmp/myscan/scanresult/ls.txt
             pwd > /tmp/myscan/scanresult/pwd.txt
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/myscan/scanresult:/tmp registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile /tmp/out.json --htmlfile /tmp/output.html --html > scanresult/out.html

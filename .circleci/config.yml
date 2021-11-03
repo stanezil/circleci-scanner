@@ -1,6 +1,6 @@
 jobs:
   build:
-    working_directory: /tmp
+    # working_directory: /tmp
     docker:
       - image: docker:18.09-git
     steps:

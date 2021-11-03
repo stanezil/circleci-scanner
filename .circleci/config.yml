@@ -15,10 +15,11 @@ jobs:
           command: |
             mkdir scanresult
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
-            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile /tmp/myscan/scanresult/out.json --htmlfile /tmp/myscan/scanresult/output.html --html > scanresult/out.html
+            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --jsonfile out.json --htmlfile output.html --html > scanresult/out.html
 
       - store_artifacts:
-          path: /tmp/myscan/scanresult
+          # path: /tmp/myscan/scanresult
+          path: /tmp/myscan
           destination: scanresult 
 workflows:
   version: 2

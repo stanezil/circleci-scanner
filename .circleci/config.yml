@@ -2,7 +2,7 @@ jobs:
   build:
     docker:
       - image: docker:18.09-git
-    working_directory: /tmp/myscan # Have to define in order to retrieve artifacts
+    working_directory: /tmp/myscan # Have to define a working directory in order to retrieve artifacts
     steps:
       - checkout
       - setup_remote_docker # Set up remote docker in order to use docker socket for CircleCI
@@ -10,13 +10,14 @@ jobs:
           name: Build image
           command: docker build -t scannercli-ci-test:${CIRCLE_SHA1} .
       - run:
-          name: Retrieve Aqua Scanner and scan build
+          name: Retrieve Aqua Scanner and scan build 
           command: |
             mkdir scanresult
             docker login registry.aquasec.com -u $AQUA_USER -p $AQUA_PASSWORD
-            docker run --name aqua -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --html > scanresult/scan.html
+            docker run -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:6.5 scan -U $SCAN_USER -P $SCAN_PASSWORD -H http://34.87.65.61:8080/ --local scannercli-ci-test:${CIRCLE_SHA1} --no-verify --html > scanresult/scan.html
       
-      ### We are able to retrieve output in all 3 formats only if the --checkonly flag is set. This is to the limitations of CircleCI which does not support volume mounting between the current jobspace and the remote docker set-up
+      ### We are able to retrieve output in all 3 formats only if the --checkonly flag is set (the --checkonly flag will not fail the build if found non-compliant as it is meant to provide a scan report only). 
+      ## CircleCI  does not support docker volume mounting between the current jobspace and the remote docker set-up, hence we cannot enable the docker container to write the output file into the tmp/myscan/scanresult directory directly
       # - run:
       #     name: Retrieve Aqua Scanner and scan build
       #     command: |
@@ -29,8 +30,8 @@ jobs:
       #       docker cp aqua:/tmp /tmp/myscan/scanresult
 
       - store_artifacts:
-          path: /tmp/myscan/scanresult
-          destination: scanresult 
+          path: /tmp/myscan/scanresult # Retrieve all the output files in the scanresult folder created
+          destination: scanresult # Optional line. Set the output folder name as scanresult in the Artifacts tab
 workflows:
   version: 2
   release:
